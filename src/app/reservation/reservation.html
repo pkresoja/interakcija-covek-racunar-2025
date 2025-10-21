@@ -18,28 +18,48 @@
     </div>
     <div class="col-12 col-md-8">
         <div class="card">
-            <div class="card-header">
-                <h5>{{movie()?.title}}</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <label for="title" class="form-label">Movie</label>
-                    <input type="text" class="form-control" id="title">
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                <div class="card-header">
+                    <h5><i class="fa-solid fa-film"></i> {{movie()?.title}}</h5>
                 </div>
-                <div class="mb-3">
-                    <label for="time" class="form-label">Vreme</label>
-                    <select class="form-select" id="time">
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="time" class="form-label">Vreme</label>
+                        <select class="form-select" id="time" formControlName="time">
+                            <option value="Utorak 22h">Utorak u 22:00</option>
+                            <option value="Sreda 21h">Sreda u 21:00</option>
+                            <option value="Petak 20h">Petak u 20:00</option>
+                            <option value="Petak 22h">Petak u 22:00</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cinema" class="form-label">Bioskop</label>
+                        <select class="form-select" id="cinema" formControlName="cinema">
+                            <option value="Ušće">Ušće Shopping Centar</option>
+                            <option value="Rakovica">BIG Rakovica</option>
+                            <option value="Rajićeva">Rajićeva</option>
+                            <option value="Ada">Ada Mall</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hall" class="form-label">Sala</label>
+                        <select class="form-select" id="hall" formControlName="hall">
+                            <option value="Velika">Velika Sala</option>
+                            <option value="Mala">Mala Sala</option>
+                            <option value="Privatna">Privatna (do 12 osoba)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Broj Karata</label>
+                        <input type="number" class="form-control" id="quantity" formControlName="quantity">
+                    </div>
                 </div>
-            </div>
-            <div class="card-footer">
-                <button class="btn btn-sm btn-success">
-                    <i class="fa-solid fa-cart-shopping"></i> Book Now
-                </button>
-            </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary">
+                        <i class="fa-solid fa-cart-shopping"></i> Book Now
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
