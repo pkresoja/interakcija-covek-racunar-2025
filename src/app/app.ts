@@ -5,6 +5,9 @@ import { Utils } from './utils';
 import { MessageModel } from '../models/message.model';
 import { RasaService } from '../services/rasa.service';
 import { FormsModule } from '@angular/forms';
+import { MovieService } from '../services/movie.service';
+import { MovieModel } from '../models/movie.model';
+import { AxiosResponse } from 'axios';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +34,7 @@ export class App {
     this.isChatVisible = !this.isChatVisible
   }
 
-  sendUserMessage() {
+  async sendUserMessage() {
     if (this.waitingForResponse) return
 
     const trimmedMessage = this.userMessage.trim()
@@ -46,27 +49,119 @@ export class App {
       text: this.botThinkingPlaceholder
     })
 
-    RasaService.sendMessage(trimmedMessage)
-      .then(rsp => {
-        if (rsp.data.length == 0) {
-          this.messages.push({
-            type: 'bot',
-            text: "Sorry, I didn't understand your question!"
-          })
-          return
-        }
+    // RasaService.sendMessage(trimmedMessage)
+    //   .then(rsp => {
+    //     if (rsp.data.length == 0) {
+    //       this.messages.push({
+    //         type: 'bot',
+    //         text: "Sorry, I didn't understand your question!"
+    //       })
+    //       return
+    //     }
 
-        for (let message of rsp.data) {
-          this.messages.push({
-            type: 'bot',
-            text: message.text
-          })
-        }
+    //     for (let message of rsp.data) {
+    //       this.messages.push({
+    //         type: 'bot',
+    //         text: message.text
+    //       })
+    //     }
 
-        // TODO: Nedostaje uklanjne bot placeholder porike nakon sto se dobije odgovor!
+    //     this.messages = this.messages.filter(m => {
+    //       if (m.type === 'bot') {
+    //         return m.text != this.botThinkingPlaceholder
+    //       }
+    //       return true
+    //     })
+    //   })
+
+    // Primer bez Rase
+    // Lokalno u TypeScript-u
+    if (trimmedMessage.includes('all movies')) {
+      await this.createBotResponseAsMovieList()
+      return
+    }
+
+    if (trimmedMessage.endsWith('movie details')) {
+      const query = trimmedMessage.split("movie details")[0].trim();
+      const movies = await MovieService.getMovies(query)
+
+      if (movies.data.length > 0) {
+        const movie = movies.data[0]
+        let html = `<ul class='list-unstyled'>`
+        html += `<li>Title: ${movie.title}</li>`
+        html += `<li>Director: ${movie.director.name}</li>`
+        html += `<li>Genres: ${movie.movieGenres.map(mg=>mg.genre.name)}</li>`
+        html += `<li>Actors: ${movie.movieActors.map(ma=>ma.actor.name)}</li>`
+        html += `</ul>`
+        html += `<p>${movie.description}</p>`
+
+        this.messages.push({
+          type: 'bot',
+          text: html
+        })
+      } else {
+        this.messages.push({
+          type: 'bot',
+          text: 'Sorry, i cant find the selected movie!'
+        })
+      }
+
+      this.removeBotPlaceholder()
+      return
+    }
+
+    const genres = await MovieService.getGenres()
+    if (trimmedMessage.includes('genre list')) {
+      let html = `<ul class='list-unstyled'>`
+      genres.data.map(g => `<li>${g.name}</li>`)
+        .forEach(g => html += g)
+      html += `</ul>`
+
+      this.messages.push({
+        type: 'bot',
+        text: html
       })
+      this.removeBotPlaceholder()
+      return
+    }
 
+    // Napravi odgovor bota bas za sve zanrove da vrati filmove  
+    for (let genre of genres.data) {
+      if (trimmedMessage.includes('genre ' + genre.name.toLowerCase())) {
+        await this.createBotResponseAsMovieList(genre.genreId)
+        return
+      }
+    }
 
+    this.removeBotPlaceholder()
+    this.messages.push({
+      type: 'bot',
+      text: 'Seams like cant help you with that!'
+    })
+  }
+
+  async createBotResponseAsMovieList(genre: number = 0) {
+    const movies = await MovieService.getMovies('', genre)
+
+    let html = `<ul class='list-unstyled'>`
+    movies.data.map(m => `<li><a href="/movie/${m.shortUrl}">${m.title} (${m.director.name})</a></li>`)
+      .forEach(m => html += m)
+    html += `</ul>`
+
+    this.messages.push({
+      type: 'bot',
+      text: html
+    })
+    this.removeBotPlaceholder()
+  }
+
+  removeBotPlaceholder() {
+    this.messages = this.messages.filter(m => {
+      if (m.type === 'bot') {
+        return m.text != this.botThinkingPlaceholder
+      }
+      return true
+    })
   }
 
   getUserName() {

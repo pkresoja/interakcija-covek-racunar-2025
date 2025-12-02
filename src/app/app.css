@@ -12,6 +12,11 @@
     max-width: 200px;
 }
 
+.msg-content {
+    max-width: 400px;
+    text-wrap: inherit;
+}
+
 /* Za Tablet */
 @media only screen and (max-width: 800px) {
     .chatbox-content {
@@ -26,6 +31,11 @@
 
     .card-chat {
         max-width: 200px;
+    }
+
+    .msg-content {
+        max-width: 320px;
+        text-wrap: inherit;
     }
 }
 
@@ -43,5 +53,10 @@
 
     .card-chat {
         max-width: 200px;
+    }
+
+    .msg-content {
+        max-width: 250px;
+        text-wrap: inherit;
     }
 }
