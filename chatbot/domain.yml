@@ -33,6 +33,12 @@ slots:
     mappings:
       - type: from_entity
         entity: order_criteria
+  movie_permalink:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: custom
+
 
 responses:
   utter_greet:
@@ -54,6 +60,9 @@ responses:
   utter_iamabot:
   - text: "I am a bot, powered by Rasa."
 
+  utter_confirm_order:
+  - text: "Please confirm your order:"
+
 actions:
   - action_hello_world
   - action_latest_movies
@@ -61,7 +70,8 @@ actions:
   - action_genre_list
   - action_actor_list
   - action_director_list
-  - action_order_movie
+  - action_extract_movie
+  - action_place_order
 
 session_config:
   session_expiration_time: 60

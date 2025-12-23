@@ -2,6 +2,7 @@ from typing import Any, Text, Dict, List
 
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import SlotSet
 import requests
 
 
@@ -127,10 +128,10 @@ class ActionDirectorList(Action):
             )
         return []
 
-class ActionOrderMovie(Action):
+class ActionExtractMovie(Action):
 
     def name(self) -> Text:
-        return "action_order_movie"
+        return "action_extract_movie"
 
     def run(self, dispatcher: CollectingDispatcher,
             tracker: Tracker,
@@ -143,11 +144,22 @@ class ActionOrderMovie(Action):
         movies = rsp.json()
 
         if len(movies) > 0:
-            bot_response = {
-                "type": "order_movie",
-                "data": movies[0]
-            }
-            dispatcher.utter_message(text='Placing an order...', attachment=bot_response)
-        else:
-            dispatcher.utter_message(text='No movie for that criteria found!') 
+            exact_movie = movies[0]
+            dispatcher.utter_message(text='Selected movie: '+ exact_movie['title'])
+            return [SlotSet('movie_permalink',exact_movie['shortUrl'])]
+        
+        dispatcher.utter_message(text='No movie for that criteria found!') 
+        return []
+    
+class ActionPlaceOrder(Action):
+
+    def name(self) -> Text:
+        return "action_place_order"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        permalink=tracker.get_slot("movie_permalink")        
+        dispatcher.utter_message(text='Permalink: '+permalink) 
         return []
