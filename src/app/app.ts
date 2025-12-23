@@ -81,16 +81,20 @@ export class App {
 
             // Simple object lists (director, genre, actor)
             if (message.attachment.type == 'genre_list' || message.attachment.type == 'actor_list' || message.attachment.type == 'director_list') {
-              let html = ''
+              let html = `<ul class='list-unstyled'>`
               for (let obj of message.attachment.data) {
-                html += `<ul class='list-unstyled p-0'>`
-                html += `<li>${obj.name}</li>`
-                html += `</ul>`
+                html += `<li>${obj.name}</li>` 
               }
+              html += `</ul>`
               this.messages.push({
                 type: 'bot',
                 text: html
               })
+            }
+
+            // Make an order
+            if (message.attachment.type == 'order_movie') {
+              this.router.navigateByUrl(`/movie/${(message.attachment.data as MovieModel).shortUrl}/reservation`)
             }
           }
 
@@ -105,6 +109,13 @@ export class App {
             return m.text != this.botThinkingPlaceholder
           }
           return true
+        })
+      })
+      .catch(() => {
+        this.removeBotPlaceholder()
+        this.messages.push({
+          type: 'error',
+          text: 'Sorry, something went wrong! Try again later.'
         })
       })
 
