@@ -78,6 +78,20 @@ export class App {
                 text: html
               })
             }
+
+            // Simple object lists (director, genre, actor)
+            if (message.attachment.type == 'genre_list' || message.attachment.type == 'actor_list' || message.attachment.type == 'director_list') {
+              let html = ''
+              for (let obj of message.attachment.data) {
+                html += `<ul class='list-unstyled p-0'>`
+                html += `<li>${obj.name}</li>`
+                html += `</ul>`
+              }
+              this.messages.push({
+                type: 'bot',
+                text: html
+              })
+            }
           }
 
           this.messages.push({
