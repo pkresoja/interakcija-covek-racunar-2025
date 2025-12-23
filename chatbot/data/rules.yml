@@ -17,6 +17,11 @@ rules:
   - intent: hello_world
   - action: action_hello_world
 
+- rule: 'Search movies'
+  steps:
+  - intent: search_movies
+  - action: action_search_movies
+
 - rule: 'Recommend movies'
   steps:
   - intent: latest_movies

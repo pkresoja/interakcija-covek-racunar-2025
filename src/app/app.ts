@@ -60,21 +60,24 @@ export class App {
         }
 
         for (let message of rsp.data) {
-          if (message.attachment != null && Array.isArray(message.attachment)) {
-            let html = ''
-            for (let movie of message.attachment as MovieModel[]) {
-              html += `<ul class='list-unstyled'>`
-              html += `<li>Title: ${movie.title}</li>`
-              html += `<li>Director: ${movie.director.name}</li>`
-              html += `<li>Genres: ${movie.movieGenres.map(mg => mg.genre.name)}</li>`
-              html += `<li>Actors: ${movie.movieActors.map(ma => ma.actor.name)}</li>`
-              html += `</ul>`
-              html += `<p>${movie.description}</p>`
+          if (message.attachment != null) {
+            // Returns movie list
+            if (message.attachment.type == 'movie_list' && Array.isArray(message.attachment.data)) {
+              let html = ''
+              for (let movie of message.attachment.data as MovieModel[]) {
+                html += `<ul class='list-unstyled'>`
+                html += `<li>Title: ${movie.title}</li>`
+                html += `<li>Director: ${movie.director.name}</li>`
+                html += `<li>Genres: ${movie.movieGenres.map(mg => mg.genre.name)}</li>`
+                html += `<li>Actors: ${movie.movieActors.map(ma => ma.actor.name)}</li>`
+                html += `</ul>`
+                html += `<p>${movie.description}</p>`
+              }
+              this.messages.push({
+                type: 'bot',
+                text: html
+              })
             }
-            this.messages.push({
-              type: 'bot',
-              text: html
-            })
           }
 
           this.messages.push({
