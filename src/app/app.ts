@@ -92,6 +92,32 @@ export class App {
               })
             }
 
+            // Simple list (array)
+            if (message.attachment.type == 'simple_list' ) {
+              let html = `<ul class='list-unstyled'>`
+              for (let obj of message.attachment.data) {
+                html += `<li>${obj}</li>` 
+              }
+              html += `</ul>`
+              this.messages.push({
+                type: 'bot',
+                text: html
+              })
+            }
+
+            // Place order
+            if (message.attachment.type == 'create_order' ) {
+              let html = `<ul class='list-unstyled'>`
+              for (let obj of message.attachment.data) {
+                html += `<li>${obj}</li>` 
+              }
+              html += `</ul>`
+              this.messages.push({
+                type: 'bot',
+                text: html
+              })
+            }
+
             // Make an order
             if (message.attachment.type == 'order_movie') {
               this.router.navigateByUrl(`/movie/${(message.attachment.data as MovieModel).shortUrl}/reservation`)
